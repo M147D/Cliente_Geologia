@@ -5,7 +5,7 @@ import DetalleElemento from "../components/mapa/DetalleElemento";
 import CrearFosil from "../components/crud/CrearFosil";
 import Sidebar from "../components/sidebar/Sidebar";
 import useElementos from "../hooks/useElementos";
-
+import AutenticacionGmail from "../components/login/AutenticacionGmail";
 const AppRouter = () => {
 
   const elementos = useElementos();
@@ -19,7 +19,8 @@ const AppRouter = () => {
         {/* Main Content */}
         <div style={{ flex: 1, padding: "1rem" }}>
           <Routes>
-            <Route path="/" element={<Mapa elementos={elementos} />} />
+            <Route path="/" element={<AutenticacionGmail />} />
+            <Route path="/mapa" element={<Mapa elementos={elementos} />} />
             <Route path="/detalle/:id" element={<DetalleElemento />} />
             <Route path="/crear-fosil" element={<CrearFosil />} />
           </Routes>

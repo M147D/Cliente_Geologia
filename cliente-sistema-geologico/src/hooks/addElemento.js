@@ -10,14 +10,14 @@ const addElemento = async (nuevoElemento, tipo) => {
       });
   
       if (!response.ok) {
-        throw new Error("Failed to add elemento");
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
   
       const savedElemento = await response.json();
       return savedElemento;
     } catch (error) {
-      console.error("Error adding elemento:", error);
-      throw error;
+      console.error("Error fetching data:", error.message);
+      return null;
     }
   };
   
