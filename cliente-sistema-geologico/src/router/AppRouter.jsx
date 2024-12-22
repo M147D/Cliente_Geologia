@@ -20,7 +20,6 @@ const AppRouter = () => {
         <div style={{ flex: 1, padding: "1rem" }}>
           <Routes>
             <Route path="/" element={<Mapa elementos={elementos} />} />
-            {/* Agrega más rutas aquí si es necesario */}
             <Route path="/detalle/:id" element={<DetalleElemento />} />
             <Route path="/crear-fosil" element={<CrearFosil />} />
           </Routes>

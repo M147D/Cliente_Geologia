@@ -9,7 +9,9 @@ const Sidebar = () => {
         <li>
           <Link to="/">Mapa</Link>
         </li>
-        {/* Agrega más enlaces aquí */}
+        <li>
+          <Link to="/crear-fosil">Crear</Link>
+        </li>
       </ul>
     </nav>
   );
