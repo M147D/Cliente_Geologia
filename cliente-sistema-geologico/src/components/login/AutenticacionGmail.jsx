@@ -1,9 +1,11 @@
 // scr/Login/AutenticacionGmail.jsx
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
-const Login = () => {
+
+const AutenticacionGmail  = () => {
+  const clientIdGoogle = import.meta.env.VITE_CLIENT_ID;
   const handleGoogleSuccess = async (credentialResponse) => {
-    console.log('Credencial de Google:', credentialResponse.credential);
+    // console.log('Credencial de Google:', credentialResponse.credential);
     try {
       // Enviar el token de Google al backend
       const response = await fetch('/api/auth/login', {
@@ -22,7 +24,7 @@ const Login = () => {
 
       const data = await response.json();
       console.log('Respuesta del backend:', data);
-      alert(`Bienvenido, ${data.email}`);
+      // alert(`Bienvenido, ${data.email}`);
     } catch (error) {
       console.error('Error al autenticar:', error);
     }
@@ -32,16 +34,13 @@ const Login = () => {
   };
 
   return (
-    <GoogleOAuthProvider clientId="506361061694-g0boebgf42pv12sbj8bmgbnq2lobvpqg.apps.googleusercontent.com">
-      <div>
-        <h1>Iniciar sesión con Google</h1>
+    <GoogleOAuthProvider clientId={clientIdGoogle}>
         <GoogleLogin
           onSuccess={handleGoogleSuccess}          
           onError={handleGoogleError}
         />
-      </div>
     </GoogleOAuthProvider>
   );
 };
 
-export default Login;
+export default AutenticacionGmail;
