@@ -10,7 +10,7 @@ const useElementos = () => {
           fetch("/api/fosil"),
           fetch("/api/roca"),
         ]);
-
+       
         const fosilesData = await fosilesResponse.json();
         const rocasData = await rocasResponse.json();
 
@@ -19,6 +19,7 @@ const useElementos = () => {
 
         const combinedData = [...fosilesConTipo, ...rocasConTipo];
         setElementos(combinedData);
+        console.log(combinedData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }

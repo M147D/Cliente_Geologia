@@ -4,81 +4,81 @@ import addElemento from "../../hooks/addElemento"; // Función de agregar elemen
 import Mapa from "../../components/mapa/Mapa";
 
 const CrearFosil = () => {
-    const elementos = useElementos(); // Obtiene los elementos de fósiles y rocas
-    const [formData, setFormData] = useState({
-        UsuarioId: 2,
-        Especie: "",
-        Periodo: "",
-        Nombre: "",
-        Edad: 0,
-        Donante: "",
-        FechaIngreso: "",
-        Codigo: "",
-        Ejemplares: 0,
-        DocumentosRelacionados: "",
-        LaminaURL: "",
-        LaminaExiste: false,
-        EstadoElemento: {
-          DescripcionEstado: "",
+  const elementos = useElementos(); // Obtiene los elementos de fósiles y rocas
+  const [formData, setFormData] = useState({
+    UsuarioId: 2,
+    Especie: "",
+    Periodo: "",
+    Nombre: "",
+    Edad: 0,
+    Donante: "",
+    FechaIngreso: "",
+    Codigo: "",
+    Ejemplares: 0,
+    DocumentosRelacionados: "",
+    LaminaURL: "",
+    LaminaExiste: false,
+    EstadoElemento: {
+      DescripcionEstado: "",
+    },
+    Ubicacion: {
+      Latitud: 0,
+      Longitud: 0,
+      Localidad: "",
+      Leyenda: "",
+      Provincia: {
+        NombreProvincia: "",
+      },
+      Pais: {
+        NombrePais: "",
+      },
+    },
+    Fotos: [
+      {
+        TipoFoto: "",
+        FechaSubida: "",
+        CreadoPor: "",
+        DescripcionEspecifica: "",
+        Etiquetas: "",
+        Imagen: "",
+        Galeria: {
+          DetalleGrupo: "",
         },
-        Ubicacion: {
-          Latitud: 0,
-          Longitud: 0,
-          Localidad: "",
-          Leyenda: "",
-          Provincia: {
-            NombreProvincia: "",
-          },
-          Pais: {
-            NombrePais: "",
-          },
-        },
-        Fotos: [
-          {
-            TipoFoto: "",
-            FechaSubida: "",
-            CreadoPor: "",
-            DescripcionEspecifica: "",
-            Etiquetas: "",
-            Imagen: "",
-            Galeria: {
-              DetalleGrupo: "",
-            },
-          },
-        ],
-      });
+      },
+    ],
+  });
 
-      const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-          ...prevData,
-          [name]: value,
-        }));
-      };
-  
-      const handleUbicacionChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-          ...prevData,
-          Ubicacion: {
-            ...prevData.Ubicacion,
-            [name]: value,
-          },
-        }));
-      };
-    
-      const handleEstadoElementoChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-          ...prevData,
-          EstadoElemento: {
-            ...prevData.EstadoElemento,
-            [name]: value,
-          },
-        }));
-      };
-  
-        // Función para manejar la carga de la imagen y convertirla a base64
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleUbicacionChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      Ubicacion: {
+        ...prevData.Ubicacion,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleEstadoElementoChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      EstadoElemento: {
+        ...prevData.EstadoElemento,
+        [name]: value,
+      },
+    }));
+  };
+
+  // Función para manejar la carga de la imagen y convertirla a base64
   const handleFileChange = (e) => {
     const file = e.target.files[0]; // Selecciona el primer archivo
     if (file) {
@@ -98,20 +98,20 @@ const CrearFosil = () => {
       reader.readAsDataURL(file); // Lee el archivo como una URL de datos (Base64)
     }
   };
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      try {
-        await addElemento(formData, "fosil");
-        alert("Fossil created successfully!");
-      } catch (error) {
-        console.error("Error creating fossil:", error);
-        alert("Failed to create fossil");
-      }
-    };
-  
-    return (
-      <div className="crear-fosil-container">
-         <div className="form-container">
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await addElemento(formData, "fosil");
+      alert("Fossil created successfully!");
+    } catch (error) {
+      console.error("Error creating fossil:", error);
+      alert("Failed to create fossil");
+    }
+  };
+
+  return (
+    <div className="crear-fosil-container">
+      <div className="form-container">
         <form onSubmit={handleSubmit}>
           <h2>Agregar Fosil</h2>
           <label>
@@ -312,13 +312,13 @@ const CrearFosil = () => {
           <button type="submit">Submit</button>
         </form>
       </div>
-  
-        <div className="map-container">
-          {/* Aquí pasamos los elementos para visualizarlos en el mapa */}
-          <Mapa elementos={elementos} />
-        </div>
+
+      <div className="map-container">
+        {/* Aquí pasamos los elementos para visualizarlos en el mapa */}
+        <Mapa elementos={elementos} />
       </div>
-    );
-  };
-  
-  export default CrearFosil;
+    </div>
+  );
+};
+
+export default CrearFosil;

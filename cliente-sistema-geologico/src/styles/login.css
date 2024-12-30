@@ -1,0 +1,59 @@
+/* Estilos para el formulario de login */
+.card-login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  max-width: 400px; /* Limita el ancho máximo */
+  margin: 80px auto; /* Centra el contenedor y añade margen superior */
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  will-change: transform, opacity; /* Optimiza animaciones */
+}
+
+/* Estilos para los elementos del formulario */
+.card-login span {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #333;
+  width: 100%;
+}
+
+.card-login span label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.card-login span input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.card-login button {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  margin-top: 10px; /* Espacio adicional entre campos y botón */
+}
+
+.card-login button:hover {
+  background-color: #0056b3;
+}
+
+.card-login button:active {
+  background-color: #0056b3;
+}

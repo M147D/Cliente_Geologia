@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import AutenticacionGmail from "./AutenticacionGmail";
+import "../../styles/login.css";
 
 const Login = ({ onLoginSuccess }) => {
 
@@ -13,10 +14,10 @@ const Login = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div>
-      <h1>Login</h1>
+    <div className="card-login">
+      <h2>Login</h2>
       <form onSubmit={handleSubmit}>
-        <div>
+        <span>
           <label>Email:</label>
           <input
             type="email"
@@ -24,8 +25,8 @@ const Login = ({ onLoginSuccess }) => {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </div>
-        <div>
+        </span>
+        <span>
           <label>Password:</label>
           <input
             type="password"
@@ -33,14 +34,14 @@ const Login = ({ onLoginSuccess }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-        </div>
+        </span>
         <button type="submit">Login</button>
       </form>
-      <section>
-        <Link to="/register">Registrar</Link>
-        <Link to="/forgot-password">Olvide mi contraseña</Link>
-      </section>
-      <AutenticacionGmail></AutenticacionGmail>
+      <Link to="/register">Registrar</Link>
+      <Link to="/forgot-password">Olvide mi contraseña</Link>
+      <span>      
+        <AutenticacionGmail />      
+      </span>
     </div>
   );
 };

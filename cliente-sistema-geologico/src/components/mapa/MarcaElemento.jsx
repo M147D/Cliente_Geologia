@@ -26,11 +26,11 @@ const MarcaElemento = ({ elementos }) => {
               <p><strong>Tipo:</strong> {elemento.Tipo || "Desconocido"}</p>
               <p><strong>Localidad:</strong> {elemento.Ubicacion.Localidad}</p>
               {elemento.Fotos?.[0]?.Imagen && (
-                  <img
-                    src={`data:image/jpeg;base64,${elemento.Fotos[0].Imagen}`}
-                    alt={elemento.Nombre}
-                    style={{ width: "100%", height: "auto", borderRadius: "5px" }}
-                  />
+                <img
+                  src={`data:image/jpeg;base64,${elemento.Fotos[0].Imagen}`}
+                  alt={elemento.Nombre}
+                  style={{ width: "100%", height: "auto", borderRadius: "5px" }}
+                />
               )}
               <Link
                 to={`/detalle/${elemento.Id}`}
