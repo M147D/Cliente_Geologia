@@ -5,7 +5,6 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 const AutenticacionGmail  = () => {
   const clientIdGoogle = import.meta.env.VITE_CLIENT_ID;
   const handleGoogleSuccess = async (credentialResponse) => {
-    // console.log('Credencial de Google:', credentialResponse.credential);
     try {
       // Enviar el token de Google al backend
       const response = await fetch('/api/auth/login', {
@@ -21,10 +20,6 @@ const AutenticacionGmail  = () => {
       if (!response.ok) {
         throw new Error('Error en la respuesta del servidor');
       }
-
-      const data = await response.json();
-      console.log('Respuesta del backend:', data);
-      // alert(`Bienvenido, ${data.email}`);
     } catch (error) {
       console.error('Error al autenticar:', error);
     }
