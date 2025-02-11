@@ -1,24 +1,16 @@
+// scr/hooks/addElementos.js
+import api from "./axiosConfig.js";
+
 const addElemento = async (nuevoElemento, tipo) => {
-    try {
-      const endpoint = tipo === "fosil" ? "/api/fosil" : "/api/roca";
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(nuevoElemento),
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
-      const savedElemento = await response.json();
-      return savedElemento;
-    } catch (error) {
-      console.error("Error fetching data:", error.message);
-      return null;
-    }
-  };
-  
-  export default addElemento;
+  try {
+    const endpoint = tipo === "fosil" ? "/api/fosil" : "/api/roca";
+    const response = await api.post(endpoint, nuevoElemento);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error al agregar elemento:", error.message);
+    return null;
+  }
+};
+
+export default addElemento;

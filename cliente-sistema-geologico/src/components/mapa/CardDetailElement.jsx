@@ -1,6 +1,7 @@
+// scr/components/mapa/CardDetailElement.jsx
 import { useLocation, Link } from "react-router-dom";
 
-const DetalleElemento = () => {
+const CardDetailElement = () => {
   const location = useLocation();
   const { elemento } = location.state || {};
 
@@ -41,4 +42,4 @@ const DetalleElemento = () => {
   );
 };
 
-export default DetalleElemento;
+export default CardDetailElement;

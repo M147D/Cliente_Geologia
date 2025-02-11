@@ -2,30 +2,29 @@
 import React from "react";
 import { Route, createBrowserRouter, createRoutesFromElements, RouterProvider } from "react-router-dom";
 import RootLayout from "./layout/RootLayout.jsx";
-import Login from "./components/login/Login.jsx";
-import Mapa from "./components/mapa/Mapa.jsx";
-import CrearFosil from "./components/crud/CrearFosil.jsx";
-import useElementos from './hooks/useElementos.js';
-import DetalleElemento from "./components/mapa/DetalleElemento.jsx";
+import PageLogin from "./pages/PageLogin.jsx";
+import PageMap from "./pages/PageMap.jsx";
+import PageForm from "./pages/PageForm.jsx";
+import CardDetailElement from "./components/mapa/CardDetailElement.jsx";
+import CardNotFound from "./components/CardNotFound.jsx";
+import PageTable from "./pages/PageTable.jsx";
 
 const App = () => {
   
-  const elementos = useElementos()
-
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path='/' element={<RootLayout />} >
-        <Route index element={<Login />} />
-        <Route path='mapa' element={<Mapa elementos={elementos} />} />
-        <Route path='crear-fosil' element={<CrearFosil />} />
-        <Route path="detalle/:id" element={<DetalleElemento />} />
+      <Route path='/' element={<RootLayout />}>
+        <Route index element={<PageLogin />} />
+        <Route path='mapa' element={<PageMap />} />
+        <Route path='crear-fosil' element={<PageForm />} />
+        <Route path='listar-elementos' element={<PageTable />} />
+        <Route path="detalle/:id" element={<CardDetailElement />} />
+        <Route path='*' element={<CardNotFound/>} />
       </Route>
     )
-  )
+  );
 
-  return (
-    <RouterProvider router={(router)}/>
-  )
-}
+  return <RouterProvider router={router} />;
+};
 
 export default App;
