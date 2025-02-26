@@ -1,17 +1,25 @@
-// src/pages/PageMap.jsx
+// src/pages/PageTable.jsx
 import React from 'react';
 import useElementos from '../hooks/useElementos.js';
-import { Box } from '@mui/material';
+import { Box, CircularProgress, Alert } from '@mui/material';
 import TableElement from '../components/crud/TableElement.jsx';
 
-const PageMap = () => {
-  const elementos = useElementos();
+const PageTable = () => {
+  const { elementos, loading, error } = useElementos();
 
   return (
     <Box sx={{ padding: '1rem'}}>
-      <TableElement elementos={elementos} />
+      {loading ? (
+        <Box display="flex" justifyContent="center" p={4}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Alert severity="error">{error}</Alert>
+      ) : (
+        <TableElement elementos={elementos} />
+      )}
     </Box>
   );
 };
 
-export default PageMap;
+export default PageTable;

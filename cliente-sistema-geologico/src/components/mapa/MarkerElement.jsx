@@ -1,3 +1,4 @@
+// src/components/mapa/MarkerElement.jsx
 import { Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import { Link } from "react-router-dom";
@@ -12,7 +13,13 @@ const customIcon = L.icon({
   shadowSize: [41, 41],
 });
 
-const MarkerElement = ({ elementos }) => {
+const MarkerElement = ({ elementos = [] }) => {
+  // Verificar que elementos sea un array
+  if (!Array.isArray(elementos)) {
+    console.error("elementos no es un array:", elementos);
+    return null;
+  }
+
   return (
     <>
       {elementos.map((elemento, index) => (
@@ -26,7 +33,7 @@ const MarkerElement = ({ elementos }) => {
               <CardContent>
                 <Typography variant="h6">{elemento.Nombre}</Typography>
                 <Typography variant="body2" color="textSecondary">
-                  <strong>Tipo:</strong> {elemento.Tipo || "Desconocido"}
+                  <strong>Tipo:</strong> {elemento.Tipo || elemento.tipo || "Desconocido"}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   <strong>Localidad:</strong> {elemento.Ubicacion.Localidad}

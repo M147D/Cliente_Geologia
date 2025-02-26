@@ -1,20 +1,39 @@
-// scr/components/mapa/CardMap.jsx
+// src/components/mapa/CardMap.jsx
 import React, { useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import MarkerElement from "./MarkerElement.jsx";
 import ComboxTypeElement from "./ComboxTypeElement.jsx";
+import { Box, CircularProgress, Alert } from "@mui/material";
 
-const CardMap = ({ elementos }) => {
-
+const CardMap = ({ elementos = [], loading, error }) => {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("todos");
+
+  // Verificar que elementos sea un array
+  const elementosArray = Array.isArray(elementos) ? elementos : [];
 
   const elementosFiltrados =
     categoriaSeleccionada === "todos"
-      ? elementos
-      : elementos.filter((elemento) => elemento.tipo === categoriaSeleccionada);
+      ? elementosArray
+      : elementosArray.filter((elemento) => elemento.tipo === categoriaSeleccionada);
 
   const positionCentro = [10, 5];
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="300px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p={2}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
 
   return (
     <>

@@ -2,14 +2,22 @@
 import React from 'react';
 import CardMap from "../components/mapa/CardMap.jsx";
 import useElementos from '../hooks/useElementos.js';
-import { Box } from '@mui/material';
+import { Box, CircularProgress, Alert } from '@mui/material';
 
 const PageMap = () => {
-  const elementos = useElementos();
+  const { elementos, loading, error } = useElementos();
 
   return (
     <Box sx={{ padding: '1rem'}}>
-      <CardMap elementos={elementos} />
+      {loading ? (
+        <Box display="flex" justifyContent="center" p={4}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Alert severity="error">{error}</Alert>
+      ) : (
+        <CardMap elementos={elementos} />
+      )}
     </Box>
   );
 };
