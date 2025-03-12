@@ -1,110 +1,141 @@
-// src/components/crud/FormElement.jsx
 import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
-import addElemento from "../../hooks/addElemento";
+import { useForm } from "react-hook-form";
+import axiosConfig from "../../hooks/axiosConfig";
 import {
-  TextField,
-  Checkbox,
-  FormControlLabel,
-  Button,
-  FormHelperText,
-  Alert,
-  Snackbar,
-  CircularProgress
+  Paper,
+  Typography,
+  Divider,
 } from "@mui/material";
+import BasicInfoSection from './BasicInfoSection';
+import LocationSection from './LocationSection';
+import PhotoSection from './PhotoSection';
+import SubmitButton from './SubmitButton';
+import Notifications from './Notifications';
 
-const FormElement = ({ tipo = "fosil" }) => {
+const FormElement = ({ tipo }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
 
-  // Definimos los valores por defecto para cada campo, incluso para propiedades anidadas.
   const {
     register,
     handleSubmit,
     control,
-    setValue,
     reset,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      // Campos comunes
-      Nombre: "",
-      Edad: 0,
-      Donante: "",
-      FechaIngreso: "",
-      Codigo: "",
-      Ejemplares: 0,
-      DocumentosRelacionados: "",
-      LaminaURL: "",
-      LaminaExiste: false,
-      EstadoElemento: { DescripcionEstado: "Activo" },
-      Ubicacion: {
-        Latitud: 0,
-        Longitud: 0,
-        Localidad: "",
-        Leyenda: "",
-        Provincia: { NombreProvincia: "" },
-        Pais: { NombrePais: "" },
-      },
-      Fotos: [{ Imagen: "" }],
-      
-      // Campos específicos de fósil
-      Especie: "",
-      Periodo: "",
-      
-      // Campos específicos de roca
-      TipoRoca: "",
-      Litologia: ""
+      especie: "",
+      periodo: "",
+      tipoRoca: "",
+      litologia: "",
+      nombre: "",
+      edad: 0,
+      donante: "",
+      codigo: "",
+      ejemplares: 0,
+      documentosRelacionados: "",
+      laminaURL: "",
+      laminaExiste: false,
+      latitud: "",
+      longitud: "",
+      localidad: "",
+      leyenda: "",
+      nombreProvincia: "",
+      nombrePais: "",
     },
   });
 
-  // Limpiar formulario cuando cambia el tipo
   useEffect(() => {
     reset();
+    setPreviewImage(null);
+    setSelectedFile(null);
   }, [tipo, reset]);
 
-  // Manejo del archivo
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64Image = reader.result.split(",")[1];
-        // Actualizamos el valor de Fotos usando setValue
-        setValue("Fotos", [{ 
-          Imagen: base64Image,
-          TipoFoto: "Principal",
-          FechaSubida: new Date().toISOString(),
-          CreadoPor: "Usuario Web"
-        }]);
-      };
-      reader.readAsDataURL(file);
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        setError(`El archivo es demasiado grande. El tamaño máximo es ${maxSize / (1024 * 1024)}MB`);
+        return;
+      }
+
+      setSelectedFile(file);
+      
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewImage(objectUrl);
+
+      return () => URL.revokeObjectURL(objectUrl);
     }
   };
 
-  // Función a ejecutar al enviar el formulario
+  const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  };
+
+  const prepareDataForAPI = (data) => {
+    const usuarioId = getCookie('user_id') || 1;
+    
+    const baseData = {
+      nombre: data.nombre,
+      edad: data.edad,
+      donante: data.donante,
+      codigo: data.codigo,
+      ejemplares: data.ejemplares,
+      documentosRelacionados: data.documentosRelacionados,
+      laminaURL: data.laminaURL,
+      laminaExiste: data.laminaExiste,
+      latitud: data.latitud,
+      longitud: data.longitud,
+      localidad: data.localidad,
+      leyenda: data.leyenda,
+      nombreProvincia: data.nombreProvincia,
+      nombrePais: data.nombrePais,
+      usuarioId: parseInt(usuarioId),
+    };
+    
+    if (tipo === "fosil") {
+      return {
+        ...baseData,
+        especie: data.especie,
+        periodo: data.periodo
+      };
+    } else {
+      return {
+        ...baseData,
+        tipoRoca: data.tipoRoca,
+        litologia: data.litologia
+      };
+    }
+  };
+
   const onSubmit = async (data) => {
     setLoading(true);
     setError(null);
     try {
-      // Obtener la cookie user_id
-      const cookies = document.cookie.split('; ');
-      const userIdCookie = cookies.find(cookie => cookie.startsWith('user_id='));
-      if (!userIdCookie) {
-        throw new Error("Usuario no autenticado");
+      if ((tipo === 'fosil' && !data.especie) || 
+          (tipo === 'roca' && !data.tipoRoca) ||
+          !data.nombre) {
+        throw new Error('Faltan campos requeridos');
       }
-      const userId = userIdCookie.split('=')[1];
       
-      // Incluir ID de usuario
-      const elementoConUsuario = {
-        ...data,
-        UsuarioId: parseInt(userId)
-      };
+      const apiData = prepareDataForAPI(data);
+      console.log('Enviando elemento:', JSON.stringify(apiData, null, 2));
       
-      await addElemento(elementoConUsuario, tipo);
+      const endpoint = tipo === 'fosil' ? '/Fosiles' : '/Rocas';
+      const response = await axiosConfig.post(endpoint, apiData);
+      
+      console.log('Respuesta del servidor:', response.data);
       setSuccess(true);
+      
       reset();
+      setPreviewImage(null);
+      setSelectedFile(null);
     } catch (error) {
       console.error(`Error al crear ${tipo}:`, error);
       setError(error.message || `Error al crear ${tipo}`);
@@ -114,218 +145,38 @@ const FormElement = ({ tipo = "fosil" }) => {
   };
 
   return (
-    <div>
+    <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <h2>Agregar {tipo === "fosil" ? "Fósil" : "Roca"}</h2>
+        <Typography variant="h4" component="h2" gutterBottom>
+          Agregar {tipo === "fosil" ? "Fósil" : "Roca"}
+        </Typography>
+        <Divider sx={{ mb: 3 }} />
 
-        {/* Campos específicos según el tipo */}
-        {tipo === "fosil" ? (
-          <>
-            <TextField
-              label="Especie"
-              fullWidth
-              margin="normal"
-              {...register("Especie", { required: "Este campo es obligatorio" })}
-              error={!!errors.Especie}
-              helperText={errors.Especie ? errors.Especie.message : ""}
-            />
-
-            <TextField
-              label="Periodo"
-              fullWidth
-              margin="normal"
-              {...register("Periodo", { required: "Este campo es obligatorio" })}
-              error={!!errors.Periodo}
-              helperText={errors.Periodo ? errors.Periodo.message : ""}
-            />
-          </>
-        ) : (
-          <>
-            <TextField
-              label="Tipo de Roca"
-              fullWidth
-              margin="normal"
-              {...register("TipoRoca", { required: "Este campo es obligatorio" })}
-              error={!!errors.TipoRoca}
-              helperText={errors.TipoRoca ? errors.TipoRoca.message : ""}
-            />
-
-            <TextField
-              label="Litología"
-              fullWidth
-              margin="normal"
-              {...register("Litologia", { required: "Este campo es obligatorio" })}
-              error={!!errors.Litologia}
-              helperText={errors.Litologia ? errors.Litologia.message : ""}
-            />
-          </>
-        )}
-
-        {/* Campos comunes */}
-        <TextField
-          label="Nombre"
-          fullWidth
-          margin="normal"
-          {...register("Nombre", { required: "Este campo es obligatorio" })}
-          error={!!errors.Nombre}
-          helperText={errors.Nombre ? errors.Nombre.message : ""}
+        <BasicInfoSection 
+          tipo={tipo} 
+          register={register} 
+          errors={errors} 
+          control={control} 
         />
-
-        <TextField
-          label="Edad"
-          type="number"
-          fullWidth
-          margin="normal"
-          {...register("Edad", { valueAsNumber: true })}
+        <LocationSection register={register} />
+        <PhotoSection 
+          register={register} 
+          handleFileChange={handleFileChange} 
+          selectedFile={selectedFile} 
+          previewImage={previewImage} 
+          tipo={tipo} 
         />
-
-        <TextField
-          label="Donante"
-          fullWidth
-          margin="normal"
-          {...register("Donante")}
-        />
-
-        <TextField
-          label="Fecha de Ingreso"
-          type="date"
-          fullWidth
-          margin="normal"
-          InputLabelProps={{ shrink: true }}
-          {...register("FechaIngreso")}
-        />
-
-        <TextField
-          label="Código"
-          fullWidth
-          margin="normal"
-          {...register("Codigo")}
-        />
-
-        <TextField
-          label="Ejemplares"
-          type="number"
-          fullWidth
-          margin="normal"
-          {...register("Ejemplares", { valueAsNumber: true })}
-        />
-
-        <TextField
-          label="Documentos Relacionados"
-          fullWidth
-          margin="normal"
-          {...register("DocumentosRelacionados")}
-        />
-
-        <TextField
-          label="URL Lámina"
-          fullWidth
-          margin="normal"
-          {...register("LaminaURL")}
-        />
-
-        <Controller
-          name="LaminaExiste"
-          control={control}
-          render={({ field }) => (
-            <FormControlLabel
-              control={<Checkbox {...field} checked={field.value} />}
-              label="¿Lámina Existe?"
-            />
-          )}
-        />
-
-        <TextField
-          label="Estado"
-          fullWidth
-          margin="normal"
-          {...register("EstadoElemento.DescripcionEstado")}
-        />
-
-        <h3>Ubicación:</h3>
-        <TextField
-          label="Latitud"
-          type="number"
-          fullWidth
-          margin="normal"
-          {...register("Ubicacion.Latitud", { valueAsNumber: true })}
-        />
-
-        <TextField
-          label="Longitud"
-          type="number"
-          fullWidth
-          margin="normal"
-          {...register("Ubicacion.Longitud", { valueAsNumber: true })}
-        />
-
-        <TextField
-          label="Localidad"
-          fullWidth
-          margin="normal"
-          {...register("Ubicacion.Localidad")}
-        />
-
-        <TextField
-          label="Leyenda"
-          fullWidth
-          margin="normal"
-          {...register("Ubicacion.Leyenda")}
-        />
-
-        <TextField
-          label="Provincia"
-          fullWidth
-          margin="normal"
-          {...register("Ubicacion.Provincia.NombreProvincia")}
-        />
-
-        <TextField
-          label="País"
-          fullWidth
-          margin="normal"
-          {...register("Ubicacion.Pais.NombrePais")}
-        />
-
-        <input type="file" onChange={handleFileChange} />
-        <Controller
-          name="Fotos"
-          control={control}
-          render={({ field: { value } }) =>
-            value && value[0] && value[0].Imagen ? (
-              <FormHelperText>Imagen cargada correctamente.</FormHelperText>
-            ) : null
-          }
-        />
-
-        <Button 
-          type="submit" 
-          variant="contained" 
-          color="primary" 
-          fullWidth
-          disabled={loading}
-          sx={{ mt: 2 }}
-        >
-          {loading ? <CircularProgress size={24} /> : `Guardar ${tipo === "fosil" ? "Fósil" : "Roca"}`}
-        </Button>
+        <SubmitButton loading={loading} tipo={tipo} />
       </form>
       
-      <Snackbar 
-        open={success} 
-        autoHideDuration={6000} 
-        onClose={() => setSuccess(false)}
-      >
-        <Alert severity="success">{tipo === "fosil" ? "Fósil" : "Roca"} creado/a exitosamente</Alert>
-      </Snackbar>
-      
-      <Snackbar 
-        open={!!error} 
-        autoHideDuration={6000} 
-        onClose={() => setError(null)}
-      >
-        <Alert severity="error">{error}</Alert>
-      </Snackbar>
-    </div>
+      <Notifications 
+        success={success} 
+        setSuccess={setSuccess} 
+        error={error} 
+        setError={setError} 
+        tipo={tipo} 
+      />
+    </Paper>
   );
 };
 

@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 const TableElement = ({ elementos }) => {
   if (!elementos || elementos.length === 0) {
+    console.log("Elementos recuperados ene table element:"+elementos);
     return <p>No hay elementos disponibles.</p>;
   }
 
@@ -25,20 +26,20 @@ const TableElement = ({ elementos }) => {
         <TableBody>
           {elementos.map((elemento, index) => (
             <TableRow key={index}>
-              <TableCell>{elemento.Nombre}</TableCell>
-              <TableCell>{elemento.Codigo}</TableCell>
-              <TableCell>{elemento.Especie || "No disponible"}</TableCell>
-              <TableCell>{elemento.Periodo || "No disponible"}</TableCell>
+              <TableCell>{elemento.nombre}</TableCell>
+              <TableCell>{elemento.codigo}</TableCell>
+              <TableCell>{elemento.especie || "No disponible"}</TableCell>
+              <TableCell>{elemento.periodo || "No disponible"}</TableCell>
               <TableCell>
-                {elemento.Ubicacion?.Localidad}, {elemento.Ubicacion?.Provincia?.NombreProvincia}, {elemento.Ubicacion?.Pais?.NombrePais}
+                {elemento.ubicacion?.localidad}, {elemento.ubicacion?.provincia?.nombreProvincia}, {elemento.ubicacion?.pais?.nombrePais}
               </TableCell>
-              <TableCell>{elemento.EstadoElemento?.DescripcionEstado || "No disponible"}</TableCell>
+              <TableCell>{elemento.estadoElemento?.descripcionEstado || "No disponible"}</TableCell>
               <TableCell>
                 <Button
                   variant="contained"
                   color="primary"
                   component={Link}
-                  to={{ pathname: `/detalle/${elemento.Codigo}`, state: { elemento } }}
+                  to={{ pathname: `/detalle/${elemento.id}`, state: { elemento } }}
                 >
                   Ver Detalle
                 </Button>
