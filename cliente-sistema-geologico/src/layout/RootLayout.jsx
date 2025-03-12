@@ -23,6 +23,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import MapIcon from '@mui/icons-material/Map';
 import DynamicFormIcon from '@mui/icons-material/DynamicForm';
 import TableChartIcon from '@mui/icons-material/TableChart';
+import ShuffleIcon from '@mui/icons-material/Shuffle';
+import HomeIcon from '@mui/icons-material/Home';
 
 const drawerWidth = 200;
 
@@ -137,9 +139,11 @@ const RootLayout = () => {
           <Divider />
           <List>
             {[
+              { label: 'Home', to: '/home', icon: <HomeIcon /> },
               { label: 'Mapa', to: '/mapa', icon: <MapIcon /> },
-              { label: 'Crear', to: '/crear-fosil', icon: <DynamicFormIcon /> },
+              { label: 'Crear', to: '/crear-elementos', icon: <DynamicFormIcon /> },
               { label: 'Listar', to: '/listar-elementos', icon: <TableChartIcon /> }, 
+              { label: 'Generador', to: '/generador-datos', icon: <ShuffleIcon /> }
             ].map((item) => (
               <ListItem key={item.label} disablePadding sx={{ display: 'block' }}>
                 <ListItemButton
