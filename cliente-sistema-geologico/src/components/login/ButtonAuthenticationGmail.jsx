@@ -1,15 +1,31 @@
-// src/components/login/ButtonAuthenticationGmail.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { Google as GoogleIcon } from '@mui/icons-material';
-import axios from 'axios';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 const ButtonAuthenticationGmail = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
+
+  // Usar useCallback para estabilizar la función
+  const handleGoogleCredentialResponse = useCallback(async (response) => {
+    try {
+      console.log("Enviando token a backend...");
+      
+      // Usar el método de login del contexto
+      await login(response.credential);
+      
+      // Navegar al mapa después del login exitoso
+      navigate('/home');
+    } catch (error) {
+      console.error('Error en login:', error);
+      alert(`Error de autenticación: ${error.message}`);
+    }
+  }, [login, navigate]);
 
   useEffect(() => {
-    // Cargar el script de Google
+    // Cargar el script de Google solo una vez
     const loadGoogleScript = () => {
       const script = document.createElement('script');
       script.src = 'https://accounts.google.com/gsi/client';
@@ -22,27 +38,41 @@ const ButtonAuthenticationGmail = () => {
       };
     };
 
-    return loadGoogleScript();
-  }, []);
+    const scriptCleanup = loadGoogleScript();
 
-  useEffect(() => {
-    // Configurar el callback para Google
-    window.handleGoogleCredentialResponse = async (response) => {
-      try {
-        const { data } = await axios.post('/api/auth/login/google', 
-          { token: response.credential },
-          { 
-            headers: { 'Content-Type': 'application/json' },
-            withCredentials: true // Equivalente a credentials: 'include' en fetch
-          }
-        );
-        console.log('Login exitoso:', data);
-        navigate('/mapa');
-      } catch (error) {
-        console.error('Error en login:', error.response?.data || error.message);
+    // Configurar el callback global para Google
+    window.handleGoogleCredentialResponse = handleGoogleCredentialResponse;
+
+    // Inicializar el cliente de Google Sign-In
+    const initializeGoogleSignIn = () => {
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+          callback: window.handleGoogleCredentialResponse,
+          ux_mode: 'popup',
+        });
       }
     };
-  }, [navigate]);
+
+    // Usar un timeout para asegurar que el script de Google se cargue
+    const initTimeout = setTimeout(initializeGoogleSignIn, 50);
+
+    // Limpiar al desmontar
+    return () => {
+      clearTimeout(initTimeout);
+      scriptCleanup();
+      delete window.handleGoogleCredentialResponse;
+    };
+  }, [handleGoogleCredentialResponse]); // Dependencia estable
+
+  const handleGoogleSignIn = () => {
+    if (window.google?.accounts?.id) {
+      window.google.accounts.id.prompt();
+    } else {
+      console.error('Google Sign-In script not loaded');
+      alert('Error al cargar el inicio de sesión de Google');
+    }
+  };
 
   return (
     <div>
@@ -50,14 +80,7 @@ const ButtonAuthenticationGmail = () => {
         variant="outlined"
         fullWidth
         startIcon={<GoogleIcon />}
-        onClick={() => {
-          window.google?.accounts.id.initialize({
-            client_id: import.meta.env.VITE_CLIENT_ID,
-            callback: window.handleGoogleCredentialResponse,
-            ux_mode: 'popup',
-          });
-          window.google?.accounts.id.prompt();
-        }}
+        onClick={handleGoogleSignIn}
       >
         Continuar con Google
       </Button>
