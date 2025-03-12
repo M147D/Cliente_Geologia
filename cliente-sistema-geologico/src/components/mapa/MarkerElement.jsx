@@ -22,38 +22,60 @@ const MarkerElement = ({ elementos = [] }) => {
 
   return (
     <>
-      {elementos.map((elemento, index) => (
-        <Marker
-          key={index}
-          position={[elemento.Ubicacion.Latitud, elemento.Ubicacion.Longitud]}
-          icon={customIcon}
-        >
-          <Popup>
-            <Card sx={{ width: 200 }}>
-              <CardContent>
-                <Typography variant="h6">{elemento.Nombre}</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  <strong>Tipo:</strong> {elemento.Tipo || elemento.tipo || "Desconocido"}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  <strong>Localidad:</strong> {elemento.Ubicacion.Localidad}
-                </Typography>
-                {elemento.Fotos?.[0]?.Imagen && (
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={`data:image/jpeg;base64,${elemento.Fotos[0].Imagen}`}
-                    alt={elemento.Nombre}
-                  />
-                )}
-                <Link to={`/detalle/${elemento.Id}`} state={{ elemento }}>
-                  Ver detalles
-                </Link>
-              </CardContent>
-            </Card>
-          </Popup>
-        </Marker>
-      ))}
+      {elementos
+        .filter(elemento => {
+          // Filtrar solo elementos con ubicación válida
+          if (!elemento?.ubicacion?.latitud || !elemento?.ubicacion?.longitud) {
+            console.warn("Elemento sin ubicación válida:", elemento);
+            return false;
+          }
+          
+          // Verificar que Latitud y Longitud sean valores parseables como números
+          const lat = parseFloat(elemento.ubicacion.latitud);
+          const lng = parseFloat(elemento.ubicacion.longitud);
+          if (isNaN(lat) || isNaN(lng)) {
+            console.warn("Coordenadas inválidas:", elemento.Ubicacion);
+            return false;
+          }
+          
+          return true;
+        })
+        .map((elemento, index) => {
+          // Convertir string a número si es necesario
+          const lat = parseFloat(elemento.ubicacion.latitud);
+          const lng = parseFloat(elemento.ubicacion.longitud);
+          
+          return (
+            <Marker
+              key={index}
+              position={[lat, lng]}
+              icon={customIcon}
+            >
+              <Popup>
+                  <CardContent sx={{ width: 200 }}>
+                    <Typography variant="h6">{elemento.nombre || "Sin nombre"}</Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      <strong>Tipo:</strong> {elemento.tipo || elemento.tipo || "Desconocido"}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      <strong>Localidad:</strong> {elemento.ubicacion.localidad || "Desconocida"}
+                    </Typography>
+                    {elemento.galeria.fotos?.[0]?.imagen && (
+                      <CardMedia
+                        component="img"
+                        height="140"
+                        image={`data:image/jpeg;base64,${elemento.galeria.fotos[0].imagen}`}
+                        alt={elemento.nombre}
+                      />
+                    )}
+                    <Link to={`/detalle/${elemento.id}`} state={{ elemento }}>
+                      Ver detalles
+                    </Link>
+                  </CardContent>
+              </Popup>
+            </Marker>
+          );
+        })}
     </>
   );
 };

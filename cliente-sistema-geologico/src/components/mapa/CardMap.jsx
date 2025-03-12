@@ -1,23 +1,31 @@
-// src/components/mapa/CardMap.jsx
 import React, { useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import MarkerElement from "./MarkerElement.jsx";
 import ComboxTypeElement from "./ComboxTypeElement.jsx";
-import { Box, CircularProgress, Alert } from "@mui/material";
+import { Box, CircularProgress, Alert, Typography, Paper } from "@mui/material";
 
 const CardMap = ({ elementos = [], loading, error }) => {
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("todos");
+  // Inicializamos con "none" en lugar de "todos"
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("none");
 
   // Verificar que elementos sea un array
   const elementosArray = Array.isArray(elementos) ? elementos : [];
 
-  const elementosFiltrados =
-    categoriaSeleccionada === "todos"
-      ? elementosArray
-      : elementosArray.filter((elemento) => elemento.tipo === categoriaSeleccionada);
+  // Filtrar elementos según la categoría seleccionada
+  const elementosFiltrados = 
+    categoriaSeleccionada === "none" 
+      ? [] // Array vacío si no hay selección
+      : categoriaSeleccionada === "todos"
+        ? elementosArray
+        : elementosArray.filter((elemento) => elemento.tipo === categoriaSeleccionada);
 
   const positionCentro = [10, 5];
+
+  // Función para manejar el cambio de filtro
+  const handleFilterChange = (nuevaCategoria) => {
+    setCategoriaSeleccionada(nuevaCategoria);
+  };
 
   if (loading) {
     return (
@@ -37,18 +45,37 @@ const CardMap = ({ elementos = [], loading, error }) => {
 
   return (
     <>
-      <ComboxTypeElement onFilterChange={setCategoriaSeleccionada} />
-      <MapContainer
-        center={positionCentro}
-        zoom={1.5}
-        style={{ flex: 1, height: "calc(100vh - 14rem)", width: "100%" , marginTop: "0.5rem"}} 
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        />
-        <MarkerElement elementos={elementosFiltrados} />
-      </MapContainer>
+      <ComboxTypeElement onFilterChange={handleFilterChange} />
+      
+      {categoriaSeleccionada === "none" ? (
+        <Paper 
+          elevation={3} 
+          sx={{ 
+            p: 3, 
+            mt: 2, 
+            height: "calc(100vh - 14rem)", 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "center" 
+          }}
+        >
+          <Typography variant="h6" color="text.secondary" align="center">
+            Por favor, seleccione una categoría para visualizar los elementos en el mapa
+          </Typography>
+        </Paper>
+      ) : (
+        <MapContainer
+          center={positionCentro}
+          zoom={1.2}
+          style={{ flex: 1, height: "calc(100vh - 14rem)", width: "100%", marginTop: "0.5rem"}} 
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          />
+          <MarkerElement elementos={elementosFiltrados} />
+        </MapContainer>
+      )}
     </>
   );
 };
