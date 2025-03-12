@@ -1,53 +1,67 @@
-// src/context/AuthContext.jsx
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import api from '../hooks/axiosConfig.js';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar si el usuario está autenticado al cargar la aplicación
-    const checkAuth = async () => {
-      try {
-        const { data } = await axios.get('/api/auth/current-user', {
-          withCredentials: true // Equivalente a credentials: 'include' en fetch
-        });
-        
-        setUser(data.user);
+    const checkAuthentication = async () => {
+      try {        
+        const response = await api.get('auth/current-user');        
+        setUser(response.data.user);
       } catch (error) {
-        console.error('Error al verificar autenticación:', error);
+        console.error('Error en verificación de autenticación:', {
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message
+        });
         setUser(null);
       } finally {
         setLoading(false);
       }
     };
-
-    checkAuth();
+    checkAuthentication();
   }, []);
 
-  const login = (userData) => {
-    setUser(userData);
+  const login = async (token) => {
+    try {
+      const { data } = await api.post('auth/login/google', { token });
+      setUser(data.user);
+      return data;
+    } catch (error) {
+      console.error('Error en login:', error);
+      throw error;
+    }
   };
 
   const logout = async () => {
     try {
-      await axios.post('/api/auth/logout', {}, {
-        withCredentials: true
-      });
+      await api.post('auth/logout');
       setUser(null);
     } catch (error) {
-      console.error('Error al cerrar sesión:', error);
+      console.error('Error en logout:', error);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      login, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === null) {
+    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
+  }
+  return context;
+};
