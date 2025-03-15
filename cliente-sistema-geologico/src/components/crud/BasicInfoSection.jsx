@@ -1,3 +1,4 @@
+// src/components/crud/BasicInfoSection.jsx
 import React from 'react';
 import { TextField, Stack, Typography, Box, FormControlLabel, Checkbox } from '@mui/material';
 import { Controller } from 'react-hook-form';

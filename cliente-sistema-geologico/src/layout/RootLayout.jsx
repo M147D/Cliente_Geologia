@@ -1,6 +1,6 @@
 // scr/layout/RootLayout.jsx
 import React, { useState } from 'react';
-import { Outlet, useLocation, Link } from 'react-router-dom';
+import { Outlet, useLocation, Link, useNavigate } from 'react-router-dom';
 import {
   Box,
   CssBaseline,
@@ -12,7 +12,8 @@ import {
   ListItem,
   ListItemButton,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  Button
 } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import MuiAppBar from '@mui/material/AppBar';
@@ -25,6 +26,8 @@ import DynamicFormIcon from '@mui/icons-material/DynamicForm';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import HomeIcon from '@mui/icons-material/Home';
+import LogoutIcon from '@mui/icons-material/Logout';
+import api from '../hooks/axiosConfig';
 
 const drawerWidth = 200;
 
@@ -93,12 +96,22 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const RootLayout = () => {
   const theme = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
   const showSidebar = location.pathname !== '/';
 
   const [open, setOpen] = useState(false);
 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/auth/logout');
+      navigate('/');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -168,6 +181,31 @@ const RootLayout = () => {
                 </ListItemButton>
               </ListItem>
             ))}
+          </List>
+          <Divider />
+          <Box sx={{ flexGrow: 1 }} />
+          <List>
+            <ListItem disablePadding sx={{ display: 'block' }}>
+              <ListItemButton
+                onClick={handleLogout}
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <LogoutIcon />
+                </ListItemIcon>
+                <ListItemText primary="Logout" sx={{ opacity: open ? 1 : 0 }} />
+              </ListItemButton>
+            </ListItem>
           </List>
         </Drawer>
       )}

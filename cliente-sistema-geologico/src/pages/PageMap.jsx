@@ -1,11 +1,25 @@
 // src/pages/PageMap.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import CardMap from "../components/mapa/CardMap.jsx";
+import Filtros from "../components/filters/Filtros.jsx";
 import useElementos from '../hooks/useElementos.js';
-import { Box, CircularProgress, Alert } from '@mui/material';
+import { Box, CircularProgress, Alert, Paper } from '@mui/material';
 
 const PageMap = () => {
   const { elementos, loading, error } = useElementos();
+  const [elementosFiltrados, setElementosFiltrados] = useState([]);
+
+  const handleApplyFilters = (filtros) => {
+    const elementosFiltrados = elementos.filter((elemento) => {
+      return Object.entries(filtros).every(([key, value]) => {
+        if (key === "tipo") {
+          return elemento[key] === value;
+        }
+        return elemento[key].toString().toLowerCase().includes(value.toString().toLowerCase());
+      });
+    });
+    setElementosFiltrados(elementosFiltrados);
+  };
 
   return (
     <Box sx={{ padding: '1rem'}}>
@@ -16,7 +30,10 @@ const PageMap = () => {
       ) : error ? (
         <Alert severity="error">{error}</Alert>
       ) : (
-        <CardMap elementos={elementos} />
+        <Paper>
+        <Filtros onApplyFilters={handleApplyFilters} />
+        <CardMap elementos={elementosFiltrados.length > 0 ? elementosFiltrados : elementos} />
+        </Paper>
       )}
     </Box>
   );
